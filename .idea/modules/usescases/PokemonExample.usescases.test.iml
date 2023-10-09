@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="SonarLintModuleSettings">
+    <option name="uniqueId" value="b9a995b8-0d14-41c7-a32e-cfb842f4fd1a" />
+  </component>
+  <component name="TestModuleProperties" production-module="PokemonExample.usescases.main" />
+</module>
