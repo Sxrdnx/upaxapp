@@ -1,14 +1,22 @@
 package com.example.pokemonexample.di
 
+import android.content.Context
+import androidx.room.Room
 import com.example.data.repository.PokemonRepository
+import com.example.data.source.PokemonLocalDataSource
 import com.example.data.source.PokemonRemoteDataSource
+import com.example.pokemonexample.data.local.PokemonDao
+import com.example.pokemonexample.data.local.PokemonDatabase
+import com.example.pokemonexample.data.local.RoomPokemonDatasource
 import com.example.pokemonexample.data.remote.PokemonApi
 import com.example.pokemonexample.data.remote.RetrofitPokemonDataSource
 import com.example.pokemonexample.utils.Constants
+import com.example.pokemonexample.utils.Constants.DATABASE_NAME
 import com.intuit.sdp.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -19,6 +27,22 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun providePokemonDatabase(
+        @ApplicationContext contex: Context
+    )= Room.databaseBuilder(contex,PokemonDatabase::class.java,DATABASE_NAME).build()
+
+    @Singleton
+    @Provides
+    fun providePokemonDao(db: PokemonDatabase) = db.pokemonDao()
+
+    @Singleton
+    @Provides
+    fun provideLocalDatasource(pokemonDao: PokemonDao): PokemonLocalDataSource {
+        return RoomPokemonDatasource(pokemonDao)
+    }
 
     @Singleton
     @Provides
@@ -50,9 +74,10 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providePokemonRepository(pokemonRemoteDataSource: PokemonRemoteDataSource): PokemonRepository{
-        return PokemonRepository(pokemonRemoteDataSource)
+    fun providePokemonRepository(pokemonRemoteDataSource: PokemonRemoteDataSource, pokemonLocalDataSource: PokemonLocalDataSource): PokemonRepository{
+        return PokemonRepository(pokemonRemoteDataSource, pokemonLocalDataSource)
     }
+
 
 
 
