@@ -1,68 +1,77 @@
 package com.example.mylocation
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
+import android.widget.Toast
+
 import com.example.mylocation.common.PermissionRequester
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.firebase.auth.FirebaseAuth
+import com.example.mylocation.databinding.ActivityMainLocationBinding
+import com.example.mylocation.service.LocService
+import com.example.mylocation.ui.LocationsAdapter
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 
 class MainActivityLocation : AppCompatActivity() {
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private lateinit var mainLocationBinding: ActivityMainLocationBinding
+    val serviceIntent: Intent by lazy {Intent(this,LocService::class.java)  }
+    val db : FirebaseFirestore by lazy {  FirebaseFirestore.getInstance() }
+    private lateinit var adapter: LocationsAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
         sendLocationPeriodically()
-        setContentView(R.layout.activity_main_location)
+        mainLocationBinding = ActivityMainLocationBinding.inflate(layoutInflater)
+        adapter = LocationsAdapter()
+        setContentView(mainLocationBinding.root)
+        mainLocationBinding.rcyDataList.adapter = adapter
+        mainLocationBinding.buttonStop.setOnClickListener {
+            stopService(serviceIntent)
+        }
+        mainLocationBinding.buttonUpdate.setOnClickListener {
+            getLocations()
+        }
     }
 
-    private fun sendLocationPeriodically() {
-        val handler = Handler(Looper.getMainLooper())
-        val db = FirebaseFirestore.getInstance()
-
-        handler.post(object : Runnable {
-            @SuppressLint("MissingPermission")
-            override fun run() {
-                // Get the user's location
-                PermissionRequester(
-                    this@MainActivityLocation,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                ).request {
-                    if (it){
-                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                            if (location != null) {
-                                val userLocation = hashMapOf(
-                                    "latitude" to location.latitude,
-                                    "longitude" to location.longitude,
-                                    "timestamp" to System.currentTimeMillis()
-                                )
-
-                                // Update the user's location in Firestore
-                                db.collection("locations")
-                                    .add(userLocation)
-                                    .addOnSuccessListener {
-                                       Log.d("FIRESTT", "c mando")
-                                    }
-                                    .addOnFailureListener {
-                                        Log.d("FIRESTT", "noo c mando")
-                                    }
-                            }
-                        }
-
-                        // Schedule the next location update after 2 minutes
-                        handler.postDelayed(this, 10 * 1000)
-                    }
+    private fun getLocations(){
+        CoroutineScope(Dispatchers.IO).launch{
+            val locationsRef = db.collection("locations").get().await()
+            if(!locationsRef.isEmpty) {
+                val listLocation = locationsRef.map {
+                    val latitude = it.data?.get("latitude") ?: "none latitud"
+                    val longitude = it.data?.get("longitude") ?: "none longitud"
+                    val date = it.data?.get("timestamp") ?: "none date"
+                    " latitude: $latitude, longitude: $longitude, date: $date"
+                }
+                runOnUiThread {
+                    adapter.submitList(listLocation)
                 }
 
             }
-        })
+        }
     }
+
+    private fun sendLocationPeriodically() {
+        PermissionRequester(
+            this@MainActivityLocation,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        ).request { permission ->
+            if (permission){
+                startService(serviceIntent)
+            }
+        }
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        startService(serviceIntent)
+    }
+
 }

@@ -9,8 +9,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.mylocation.MainActivityLocation
 import com.example.pokemonexample.databinding.FragmentHomeBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+
 
 
 class HomeFragment : Fragment() {
