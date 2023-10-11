@@ -22,14 +22,21 @@ class RoomPokemonDatasource @Inject constructor(private val pokemonDao: PokemonD
                 pokemonDao.getPokemonOffline().map { it.toPokemonDomain() }
             }
             catch (e: Exception) {
-                emptyList<PokemonDomain>()
+                emptyList()
             }
         }
     }
 
 
-    override fun getPokemonById(id: Int): PokemonDomain? {
-        TODO("Not yet implemented")
+    override suspend fun getPokemonById(id: Int): PokemonDomain? {
+        return withContext(Dispatchers.IO) {
+            try {
+                pokemonDao.getPokemonById(id)?.toPokemonDomain()
+            }
+            catch (e: Exception) {
+                PokemonDomain()
+            }
+        }
     }
 
     override suspend fun saveAPokemon(pokemon: PokemonDetail) {

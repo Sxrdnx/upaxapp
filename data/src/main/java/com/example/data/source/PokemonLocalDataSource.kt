@@ -12,7 +12,7 @@ interface PokemonLocalDataSource {
       suspend fun getALLPokemon(): List<PokemonDomain>
 
 
-    fun getPokemonById(id: Int): PokemonDomain?
+    suspend  fun getPokemonById(id: Int): PokemonDomain?
 
     
    suspend fun saveAPokemon(pokemon: PokemonDetail)

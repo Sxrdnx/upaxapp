@@ -5,6 +5,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'dagger.hilt.android.plugin'
     id 'androidx.navigation.safeargs'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -52,6 +53,8 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
+    // Activity KTX for viewModels()
+    implementation "androidx.activity:activity-ktx:1.8.0"
 
     //scale size unit (support for diferent screen size)
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
@@ -61,8 +64,6 @@ dependencies {
     kapt "androidx.room:room-compiler:2.5.2"
     implementation "androidx.room:room-ktx:2.5.2"
 
-    // Activity KTX for viewModels()
-    implementation "androidx.activity:activity-ktx:1.8.0"
 
     //navigation
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.4'
@@ -90,11 +91,16 @@ dependencies {
     kapt "com.github.bumptech.glide:compiler:4.11.0"
     implementation "com.github.bumptech.glide:okhttp3-integration:4.11.0"
 
+    implementation platform('com.google.firebase:firebase-bom:32.3.1')
+    implementation 'com.google.firebase:firebase-database-ktx:20.2.2'
+    implementation 'com.google.firebase:firebase-auth' // If you need Firebase Authentication
+    implementation 'com.google.firebase:firebase-firestore' // Cloud Firesto
 
     //modules
     implementation project(":data")
     implementation project(":domain")
     implementation project(":usecases")
+    implementation project(":mylocation")
 
 
 }

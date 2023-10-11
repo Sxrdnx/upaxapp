@@ -2,6 +2,8 @@ package com.example.pokemonexample.di
 
 import android.content.Context
 import androidx.room.Room
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.example.data.repository.PokemonRepository
 import com.example.data.source.PokemonLocalDataSource
 import com.example.data.source.PokemonRemoteDataSource
@@ -78,7 +80,10 @@ object AppModule {
         return PokemonRepository(pokemonRemoteDataSource, pokemonLocalDataSource)
     }
 
-
+    @Provides
+    fun provideGlideInstance(   @ApplicationContext contex: Context): RequestManager {
+        return Glide.with(contex)
+    }
 
 
 }

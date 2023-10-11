@@ -9,18 +9,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestManager
 import com.example.data.Resource
 import com.example.data.Status
 import com.example.domain.PokemonElement
 import com.example.pokemonexample.databinding.FragmentPokemonListBinding
 import com.example.pokemonexample.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import com.example.pokemonexample.utils.Event as UtilsEvent
 
 @AndroidEntryPoint
-class PokemonList : Fragment() {
+class PokemonList : Fragment(),PokemonListener {
+    @Inject
+    lateinit var glide: RequestManager
+
     private lateinit var pokemonListBinding: FragmentPokemonListBinding
     private val pokemonListViewModel: PokemonListViewModel by viewModels()
     lateinit var adapter: PokemonListAdapter
@@ -32,7 +38,7 @@ class PokemonList : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        adapter = PokemonListAdapter()
+        adapter = PokemonListAdapter(glide,this)
         pokemonListBinding = FragmentPokemonListBinding.inflate(inflater,container,false)
         return pokemonListBinding.root
     }
@@ -82,6 +88,12 @@ class PokemonList : Fragment() {
             }
 
         }
+    }
+
+    override fun onClickElement(id: Int) {
+        this.findNavController().navigate(
+            PokemonListDirections.actionPokemonListToPokemonDetailFragment(id)
+        )
     }
 
 

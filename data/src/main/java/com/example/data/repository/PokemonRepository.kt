@@ -33,5 +33,5 @@ class PokemonRepository @Inject constructor(
 
    suspend  fun getAllPokemonsLocal()= localDataSource.getALLPokemon()
 
-
+   suspend fun getPokemonById(id: Int) = localDataSource.getPokemonById(id)
 }

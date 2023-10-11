@@ -35,7 +35,7 @@ class PokemonListViewModel @Inject constructor(
 
     fun getPokemonDatabase(){
         viewModelScope.launch(Dispatchers.IO) {
-            val result = pokemonRepository.getAllPokemonsLocal().map {  PokemonElement(it.nombre,it.sprites,it.favorite)}
+            val result = pokemonRepository.getAllPokemonsLocal().map {  PokemonElement(it.nombre,it.sprites,it.favorite, id = it.id)}
             _pokemonLits.postValue(Event(Resource.success(result)))
         }
     }

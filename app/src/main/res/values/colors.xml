@@ -10,4 +10,5 @@
     <color name="primaryLight">#65818b</color>
     <color name="primaryDark">#0f2c34</color>
     <color name="secondaryText">#FF000000</color>
+    <color name="new_indigo_light">#F5F2F8</color>
 </resources>
